@@ -1,13 +1,39 @@
 {
-	"name": "tuber_certs",
-	"description": "",
-	"version": "0.0.1",
-	"author": "Gregory Thompson",
-	"engines": {
-		"node": "0.10.x",
-		"npm": "1.4.x"
-	},
-	"dependencies": {
-		"pem": "latest"
-	}
+  "name": "tuber_certs",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "https://github.com/GTDev87/tuber_certs",
+  "repository": "GTDev87/tuber_certs",
+  "author": "Gregory Thompson",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "keywords": [],
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.4.x"
+  },
+  "dependencies": {
+    "cert_encoder": "0.0.0",
+    "node-rsa": "^0.2.25",
+    "pem": "^1.7.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.6.0",
+    "gulp-exclude-gitignore": "^1.0.0",
+    "gulp-istanbul": "^0.9.0",
+    "gulp-jscs": "^1.1.0",
+    "gulp-jshint": "^1.5.3",
+    "gulp-mocha": "^2.0.0",
+    "gulp-plumber": "^1.0.0",
+    "gulp-nsp": "^0.4.5",
+    "jshint-stylish": "^1.0.0"
+  },
+  "scripts": {
+    "prepublish": "gulp prepublish",
+    "test": "gulp",
+    "debug": "node debug node_modules/gulp/bin/gulp.js test"
+  },
+  "license": "MIT"
 }

@@ -1,3 +1,5 @@
+'use strict';
+
 var tls = require('tls');
 var fs = require('fs');
 var pem = require('pem');
@@ -13,15 +15,17 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
     //ca: [ fs.readFileSync('server/server-certificate.pem') ]//HOW DO I IGNORE THIS
   };
    
+  console.log("keys.certificate = %j", keys.certificate);
+
   var socketClearTextStream = tls.connect(8081, options, function() {
-    socketClearTextStream.write(socketClearTextStream.getTLSTicket());
+    socketClearTextStream.write("hello my name is greg");
     process.stdin.pipe(socketClearTextStream);
     process.stdin.resume();
   });
   socketClearTextStream.setEncoding('utf8');
   socketClearTextStream.on('data', function(data) {
-    console.log("data");
-    console.log(data);
+    // console.log("data");
+    // console.log(data);
   });
   socketClearTextStream.on('end', function() {
     console.log("end")
