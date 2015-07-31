@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "cert_encoder": "0.0.0",
+    "macaroons.js": "^0.3.5",
     "node-rsa": "^0.2.25",
     "pem": "^1.7.2"
   },
