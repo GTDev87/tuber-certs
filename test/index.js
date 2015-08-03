@@ -34,10 +34,6 @@ describe('tuber_certs', function () {
 
   it('bindCertificatePublicKey3rdParty', function (done) {
     tuberCerts.bindCertificatePublicKey3rdParty(serializedMac, "www2", "secret caveat key", fooCertPem, "account = 12345", function (err, publicKeyEncrypted) {
-      console.log("before decoded");
-      console.log("ursa = %j", ursa);
-
-
       var decoded = fooPrivKey.decrypt(publicKeyEncrypted.discharge, 'base64', 'utf8');
       expect(decoded).to.equal('caveat_key = secret caveat key\nmessage = account = 12345\n');
       done();
