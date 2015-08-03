@@ -4,8 +4,6 @@ var tls = require('tls');
 var net = require('net');
 var fs = require('fs');
 var sys = require('sys');
-var crypto = require('crypto');
-var NodeRSA = require('node-rsa');
 var cert_encoder = require('cert_encoder');
 
 

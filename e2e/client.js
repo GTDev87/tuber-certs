@@ -3,6 +3,8 @@
 var tls = require('tls');
 var fs = require('fs');
 var pem = require('pem');
+var ursa = require('ursa');
+
 
 pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
   var options = {
@@ -14,6 +16,9 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
     // This is necessary only if the server uses the self-signed certificate
     //ca: [ fs.readFileSync('server/server-certificate.pem') ]//HOW DO I IGNORE THIS
   };
+
+  console.log("cert = " + keys.certificate);
+  console.log("priv = " + keys.serviceKey);
    
   console.log("keys.certificate = %j", keys.certificate);
 
