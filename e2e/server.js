@@ -29,9 +29,9 @@ pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
   var app = express();
 
   app.route('/').get(function(req, res) {
-    debugger;
 
-    console.log("req.connection.getPeerCertificate() = %j", req.connection.getPeerCertificate());
+    var pemCert = cert_encoder.convert(req.connection.getPeerCertificate().raw);
+    console.log("pemCert = %j", pemCert)
     res.json({ index: "data" });
   });
 
