@@ -31,4 +31,4 @@ tuberClient.createConnection(privKey, macaroonWithCaveat, "https://" + ip + ":" 
   console.log("err = %j", err);
   console.log("response = %j", response);
   console.log("body = %j", body);
-})  
+});

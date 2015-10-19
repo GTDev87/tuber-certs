@@ -100,9 +100,9 @@ pem.getPublicKey(clientCert, function (err, data) {
       console.log(pemCert);
       console.log("i ran this route");
 
-
-
-
+      var token = getTokenFromReq(req, 'Bearer');
+      console.log("token = %j", token);
+      
       res.json({ index: "data" });
     });
 
