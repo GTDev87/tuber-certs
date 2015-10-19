@@ -8,18 +8,56 @@ var cert_encoder = require('cert_encoder');
 var express = require('express');
 var macattackExpress = require('macattack-express');
 var pem = require('pem');
+var crypto = require('crypto');
+var publicKeyMacaroons = require('public-key-macaroons');
+var macattack = require('macattack');
+
+
+//copy of macattack express
+function getTokenFromReq(req, headerKey) {
+  if (req.headers && req.headers.authorization) {
+    var parts = req.headers.authorization.split(' ');
+    if (parts.length === 2 && parts[0] === headerKey) { return parts[1]; }
+  }
+  throw new Error("macaroon not found");
+}
+
+module.exports = function (optionsObj) {
+  var options = optionsObj || {};
+  return function (req, res, next){
+    var serializedMac;
+    var pemCert = cert_encoder.convert(req.connection.getPeerCertificate().raw);//certificate for comprison
+
+    try { serializedMac = getTokenFromReq(req, optionsObj.headerKey || 'Bearer'); }
+    catch (e) { return next(e); }
+
+    //separate out 3rd party caveat portion
+
+    if(!macattack.validateMac(serializedMac, optionsObj.secret || "secret", req.body)) { 
+      // validateMac(serializedMac, databaseSecret, requestData);
+
+      return next(new Error("Macaroon is not valid ")); 
+    }
+
+    return next();
+  }
+};
+//////
+
+
+
+
 
 var args = process.argv.slice(2);
 console.log("args = %j", args);
-var cerfileLocation = args[0];
+var cerfileLocation = args[0] || (__dirname + "/../tmp/cert.pem");
 
+var clientCert = fs.readFileSync(cerfileLocation, "utf-8");
+console.log("clientCert = %j", clientCert);
 
-var cert = fs.readFileSync(cerfileLocation, "utf-8");
-
-pem.getPublicKey(cert, function (err, data) {
+pem.getPublicKey(clientCert, function (err, data) {
   var caveatKey = crypto.createHash('md5').digest('hex');
 
-  console.log("cert = %j", cert);
 
   function condenseCertificate(cert){
     return cert
@@ -28,9 +66,13 @@ pem.getPublicKey(cert, function (err, data) {
       .replace(/\n/g, "");
   }
 
-  var caveatMacaroon = publicKeyMacaroons.addPublicKey3rdPartyCaveat(serializedMacaroon, "For initializing client", caveatKey, "cert = " + condenseCertificate(cert), data.publicKey);
+  var serializedMacaroon = macattack.createMac("localhost", 8081, "secretKey");
 
-  console.log("client_macaroon=" + JSON.stringify(caveatMacaroon));
+
+  var caveatMacaroon = publicKeyMacaroons.addPublicKey3rdPartyCaveat(serializedMacaroon, "For initializing client", caveatKey, "cert = " + condenseCertificate(clientCert), data.publicKey);
+
+  console.log("client_macaroon = " + JSON.stringify(caveatMacaroon));
+  fs.writeFileSync(__dirname + "/../tmp/macaroon.json", JSON.stringify(caveatMacaroon), 'utf8');
 
   pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
     var options = {
@@ -54,7 +96,13 @@ pem.getPublicKey(cert, function (err, data) {
     app.route('/').get(function(req, res) {
 
       var pemCert = cert_encoder.convert(req.connection.getPeerCertificate().raw);
-      console.log("pemCert = %j", pemCert)
+      console.log("pemCert");
+      console.log(pemCert);
+      console.log("i ran this route");
+
+
+
+
       res.json({ index: "data" });
     });
 

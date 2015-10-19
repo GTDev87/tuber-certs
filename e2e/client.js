@@ -12,30 +12,23 @@ console.log("args = %j", args);
 // var ip = args[0];
 // var port = args[1];
 // var secretFileLocation = args[2];
-var macaroonFileLocation = args[0];
+var privKeyLocation = args[0] || __dirname + "/../tmp/priv.pem";
+var macaroonFileLocation = args[1] || __dirname + "/../tmp/macaroon.json";
 
-pem.createPrivateKey(function (err, pemKeyObj) {
-  console.log("pemKeyObj = %j", pemKeyObj);
+console.log("macaroonFileLocation = %j", macaroonFileLocation);
+var macaroonWithCaveat = JSON.parse(fs.readFileSync(macaroonFileLocation, "utf8"));
 
-  pem.createCertificate({days:1, selfSigned:true, serviceKey: pemKeyObj.key}, function(err, keys){
+console.log("macaroonWithCaveat = %j", macaroonWithCaveat);
 
-    console.log("err = %j", err);
-    if(err) { console.log("err.message = %j", err.message);}
+console.log("privKeyLocation = %j", privKeyLocation);
+var privKey = fs.readFileSync(privKeyLocation, "utf8");
 
-    
 
-    console.log("cert = " + keys.certificate);
-    console.log("priv = " + keys.serviceKey);
+var ip = "localhost";
+var port = 8081;
 
-    var ip = "localhost";
-    var port = 8081;
-
-    console.log("macaroonFileLocation = %j", macaroonFileLocation);
-    var macaroonWithCaveat = fs.readFileSync(macaroonFileLocation, "utf8");
-     
-    console.log("keys.certificate = %j", keys.certificate);
-    tuberClient.createConnection(keys.serviceKey, macaroonWithCaveat, "https://" + ip + ":" + port, function (error, response, body) {
-
-    })
-  });
-});
+tuberClient.createConnection(privKey, macaroonWithCaveat, "https://" + ip + ":" + port, function (err, response, body) {
+  console.log("err = %j", err);
+  console.log("response = %j", response);
+  console.log("body = %j", body);
+})  
