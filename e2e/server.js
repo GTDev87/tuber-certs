@@ -13,7 +13,6 @@ var crypto = require('crypto');
 var publicKeyMacaroons = require('public-key-macaroons');
 var macattack = require('macattack');
 
-
 var MacaroonsBuilder = require('macaroons.js').MacaroonsBuilder;
 var MacaroonsVerifier = require('macaroons.js').MacaroonsVerifier;
 
