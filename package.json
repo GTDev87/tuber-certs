@@ -17,13 +17,14 @@
   "dependencies": {
     "cert_encoder": "0.0.0",
     "express": "^4.13.3",
+    "lodash": "^3.10.1",
     "macaroons.js": "^0.3.5",
-    "macattack": "0.0.5",
-    "macattack-express": "0.0.3",
+    "macattack": "0.0.6",
+    "macattack-express": "0.0.9",
     "pem": "^1.7.2",
-    "public-key-macaroons": "0.0.4",
+    "public-key-macaroons": "0.0.5",
     "request": "^2.65.0",
-    "tuber-client": "0.0.4",
+    "tuber-client": "0.0.5",
     "ursa": "^0.8.5"
   },
   "devDependencies": {

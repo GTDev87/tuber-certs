@@ -2,7 +2,7 @@
 
 var tls = require('tls');
 var pem = require('pem');
-var tuberClient = require('tuber-client');
+var tuberClient = require('../../tuber-client');
 var request = require('request');
 var fs = require("fs");
 
@@ -22,7 +22,6 @@ console.log("macaroonWithCaveat = %j", macaroonWithCaveat);
 
 console.log("privKeyLocation = %j", privKeyLocation);
 var privKey = fs.readFileSync(privKeyLocation, "utf8");
-
 
 var ip = "localhost";
 var port = 8081;

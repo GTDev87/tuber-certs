@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash');
 var tls = require('tls');
 var fs = require('fs');
 var sys = require('sys');
@@ -15,77 +16,6 @@ var macattack = require('macattack');
 
 var MacaroonsBuilder = require('macaroons.js').MacaroonsBuilder;
 var MacaroonsVerifier = require('macaroons.js').MacaroonsVerifier;
-
-
-//copy of macattack express
-function getTokenFromReq(req, headerKey) {
-  if (req.headers && req.headers.authorization) {
-    var parts = req.headers.authorization.split(' ');
-    if (parts.length > 1 && parts[0] === headerKey) { return parts.slice(1).join(" "); }
-  }
-  throw new Error("macaroon not found");
-}
-
-
-
-function expressPartial (optionsObj) {
-  var options = optionsObj || {};
-  return function (req, res, next){
-
-    console.log("thing");
-
-    var pemCert = cert_encoder.convert(req.connection.getPeerCertificate().raw);
-    console.log("pemCert");
-    console.log(pemCert);
-    console.log("I am in the middleware");
-
-    var token = getTokenFromReq(req, 'Bearer');
-    console.log("token = %j", token);
-
-
-    var serializedMac;
-    var pemCert = cert_encoder.convert(req.connection.getPeerCertificate().raw);//certificate for comprison
-
-    try { serializedMac = getTokenFromReq(req, optionsObj.headerKey || 'Bearer'); }
-    catch (e) { return next(e); }
-
-    //separate out 3rd party caveat portion
-
-
-    console.log("MacaroonsBuilder.deserialize(serializedMac)");
-    console.log("");
-    console.log(MacaroonsBuilder.deserialize(serializedMac));
-    console.log("");
-
-    var macaroon = MacaroonsBuilder.deserialize(serializedMac);
-
-    console.log("optionsObj.secret = %j",optionsObj.secret);
-    console.log("ab")
-
-    new MacaroonsVerifier(macaroon)
-      .assertIsValid(optionsObj.secret);
-
-    console.log("abc")
-
-
-    // verifier.satisfyGeneral(schemaVerifierCreater(parser, requestData).verifyArguments);
-    // return verifier.isValid(databaseSecret);
-
-
-    // if(!macattack.validateMac(serializedMac, optionsObj.secret || "secret", req.body)) { 
-    //   // validateMac(serializedMac, databaseSecret, requestData);
-
-    //   return next(new Error("Macaroon is not valid ")); 
-    // }
-
-    return next();
-  }
-};
-//////
-
-
-
-
 
 var args = process.argv.slice(2);
 console.log("args = %j", args);
@@ -107,12 +37,10 @@ pem.getPublicKey(clientCert, function (err, data) {
       .replace(/\n/g, "");
   }
 
-  var serializedMacaroon = macattack.createMac("localhost", 8081, secretKey);
+  var rootMacaroon = macattack.createMac("localhost", 8081, secretKey);
 
+  var caveatMacaroon = publicKeyMacaroons.addPublicKey3rdPartyCaveat(rootMacaroon, "Macattack", caveatKey, "cert = " + condenseCertificate(clientCert), data.publicKey);
 
-  var caveatMacaroon = publicKeyMacaroons.addPublicKey3rdPartyCaveat(serializedMacaroon, "Macattack", caveatKey, "cert = " + condenseCertificate(clientCert), data.publicKey);
-
-  console.log("client_macaroon = " + JSON.stringify(caveatMacaroon));
   fs.writeFileSync(__dirname + "/../tmp/macaroon.json", JSON.stringify(caveatMacaroon), 'utf8');
 
   pem.createCertificate({days:1, selfSigned:true}, function(err, keys){
@@ -133,7 +61,8 @@ pem.getPublicKey(clientCert, function (err, data) {
     };
 
     var app = express();
-    app.use(expressPartial({secret: secretKey}));
+
+    app.use(macattackExpress({secret: secretKey}));
 
     app.route('/').get(function(req, res) {
       res.json({ index: "data" });
@@ -143,13 +72,7 @@ pem.getPublicKey(clientCert, function (err, data) {
 
     console.log("keys.certificate = %j", keys.certificate);
 
-    pem.getPublicKey(keys.certificate, function (err, data){
-      console.log("data = %j", data);
-    });
-
-    var httpsApp = https.createServer(options, app);
-
-    httpsApp.listen(8081, '0.0.0.0');
+    https.createServer(options, app).listen(8081, '0.0.0.0');
   });
 });
 
