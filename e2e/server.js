@@ -61,17 +61,19 @@ pem.getPublicKey(clientCert, function (err, data) {
 
     var app = express();
 
-    app.use(macattackExpress({secret: secretKey}));
+    macattackExpress({secret: secretKey, hostPort: 8081, hostIp: "localhost", cert: clientCert}, function (err, middlewareFnObj) {
+      if(err) {return console.log("fail");}
+      app.use(middlewareFnObj);
 
-    app.route('/').get(function(req, res) {
-      res.json({ index: "data" });
+      app.route('/').get(function(req, res) {
+        res.json({ index: "data" });
+      });
+
+      // Return Express server instance vial callback
+
+      console.log("keys.certificate = %j", keys.certificate);
+
+      https.createServer(options, app).listen(8081, '0.0.0.0');
     });
-
-    // Return Express server instance vial callback
-
-    console.log("keys.certificate = %j", keys.certificate);
-
-    https.createServer(options, app).listen(8081, '0.0.0.0');
   });
 });
-
