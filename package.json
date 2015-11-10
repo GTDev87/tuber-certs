@@ -24,7 +24,7 @@
     "pem": "^1.7.2",
     "public-key-macaroons": "0.0.5",
     "request": "^2.65.0",
-    "tuber-client": "0.0.7",
+    "tuber-client": "0.0.12",
     "ursa": "^0.8.5"
   },
   "devDependencies": {

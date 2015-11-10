@@ -19,13 +19,7 @@ var macaroonWithCaveat = JSON.parse(fs.readFileSync(macaroonFileLocation, "utf8"
 
 // console.log("macaroonWithCaveat = %j", macaroonWithCaveat);
 
-// console.log("privKeyLocation = %j", privKeyLocation);
-var privKey = fs.readFileSync(privKeyLocation, "utf8");
-
-var ip = "localhost";
-var port = 8081;
-
-tuberClient.createConnection(privKey, macaroonWithCaveat, "https://" + ip + ":" + port, function (err, response, body) {
+tuberClient.createConnection(privKeyLocation, macaroonWithCaveat, {ip: "localhost", port: 8081}, function (err, response, body) {
   console.log("err = %j", err);
   console.log("response = %j", response);
   console.log("body = %j", body);
